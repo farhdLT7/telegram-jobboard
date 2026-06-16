@@ -1,0 +1,35 @@
+name: 🤖 Run Telegram Bots 24/7
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+jobs:
+  run-bots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+      - name: Run Bots
+        env:
+          BOT1_TOKEN: ${{ secrets.BOT1_TOKEN }}
+          BOT2_TOKEN: ${{ secrets.BOT2_TOKEN }}
+          TARGET_CHANNEL: ${{ secrets.TARGET_CHANNEL }}
+          ADMIN_CHAT_ID: ${{ secrets.ADMIN_CHAT_ID }}
+          SOURCE_CHANNELS: ${{ secrets.SOURCE_CHANNELS }}
+          PAYMENT_PROVIDER_TOKEN: ${{ secrets.PAYMENT_PROVIDER_TOKEN }}
+          PRICE_JOB_AD: ${{ secrets.PRICE_JOB_AD }}
+          PRICE_FREELANCE_PROJECT: ${{ secrets.PRICE_FREELANCE_PROJECT }}
+          CHANNEL_DISPLAY_NAME: ${{ secrets.CHANNEL_DISPLAY_NAME }}
+          CHECK_INTERVAL_SECONDS: ${{ secrets.CHECK_INTERVAL_SECONDS }}
+        run: |
+          python bot1_scraper/bot1.py &
+          python bot2_order/bot2.py &
+          wait
